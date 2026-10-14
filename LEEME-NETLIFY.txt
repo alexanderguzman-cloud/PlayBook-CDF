@@ -1,0 +1,14 @@
+SomosCX — despliegue en Netlify
+
+1. Sube TODO el contenido de esta carpeta (incluida la carpeta netlify/) a la raíz del repositorio conectado a Netlify.
+   No requiere comando de build. Netlify detecta solas las funciones de netlify/edge-functions.
+2. Variables de entorno (Netlify › Site configuration › Environment variables):
+   GOOGLE_CLIENT_ID  = el ID de cliente OAuth de Google Cloud (termina en .apps.googleusercontent.com)
+   SESSION_SECRET    = una clave larga y aleatoria (mínimo 32 caracteres). No la compartas con nadie.
+   SHEETS_URL        = la URL /exec de la aplicación web de Apps Script (ver apps-script.gs)
+   SHEETS_TOKEN      = la misma clave que pusiste como TOKEN en las propiedades del Apps Script
+   ALLOWED_DOMAIN    = somosinternet.co (opcional; es el valor por defecto)
+3. Acceso: todo el sitio exige iniciar sesión con Google @somosinternet.co (login.html). La sesión dura 12 horas.
+4. Clics y comentarios: llegan a los Sheets «SomosCX · Clics por usuario» y «SomosCX · Comentarios y sugerencias».
+   Si el Apps Script no está configurado, los comentarios caen al formulario «reporte-error» de Netlify Forms.
+   Las preguntas que el asistente no supo responder llegan a la pestaña «Preguntas sin respuesta» del Sheet de comentarios.

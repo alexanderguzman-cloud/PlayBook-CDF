@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SomosCX · Ingresar</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0A0A0A">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;600&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#0A0A0A;color:#FFFFFF;font-family:'ITC Avant Garde Gothic','ITC Avant Garde',Jost,'Century Gothic',sans-serif}
+  .caja{width:100%;max-width:440px;display:flex;flex-direction:column;gap:28px}
+  .mono{font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.2em;color:#A9A9A9}
+  h1{margin:0;font-size:44px;font-weight:300;letter-spacing:-.02em;line-height:1.05}
+  p{margin:0;font-size:15px;line-height:1.5;color:#E5E5E5}
+  .tarjeta{padding:22px;border:1px solid #373737;border-radius:16px;background:#171717;display:flex;flex-direction:column;gap:14px;align-items:flex-start}
+  #msg{min-height:20px;font-size:13.5px;color:#FE8483}
+  .marca{display:flex;align-items:center;gap:14px}
+</style>
+</head>
+<body>
+<div class="caja">
+  <div class="marca">
+    <svg width="44" height="30" viewBox="8 10 48 30" aria-label="Somos" role="img"><path d="M10 20 V31 a5.5 5.5 0 0 0 11 0 V18 a5.5 5.5 0 0 1 11 0 V31 a5.5 5.5 0 0 0 11 0 V18 a5.5 5.5 0 0 1 11 0 V26" fill="none" stroke="#FFFFFF" stroke-width="4.6"/></svg>
+    <span class="mono">SOMOSCX · CUSTOMER EXPERIENCE</span>
+  </div>
+  <div>
+    <h1>Ingresa con tu cuenta Somos</h1>
+    <p style="margin-top:14px">Acceso exclusivo para cuentas de Google <strong id="dom">@somosinternet.co</strong>.</p>
+  </div>
+  <div class="tarjeta">
+    <span class="mono">INICIAR SESIÓN</span>
+    <div id="btn" style="min-height:44px"></div>
+    <div id="msg"></div>
+  </div>
+</div>
+<script>
+  const msg = t => { document.getElementById('msg').textContent = t || ''; };
+  async function iniciar() {
+    let c;
+    try { c = await (await fetch('/api/config')).json(); } catch (e) { msg('No pudimos cargar la configuración. Recarga la página.'); return; }
+    if (!c.clientId) { msg('Falta configurar GOOGLE_CLIENT_ID en Netlify.'); return; }
+    document.getElementById('dom').textContent = '@' + c.dominio;
+    google.accounts.id.initialize({ client_id: c.clientId, hd: c.dominio, ux_mode: 'popup', callback: async r => {
+      msg('Validando tu cuenta…');
+      try {
+        const x = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ credential: r.credential }) });
+        const d = await x.json();
+        if (d.ok) location.href = '/'; else msg(d.error || 'No pudimos validar tu cuenta.');
+      } catch (e) { msg('No pudimos validar tu cuenta. Intenta de nuevo.'); }
+    } });
+    google.accounts.id.renderButton(document.getElementById('btn'), { theme: 'outline', size: 'large', shape: 'pill', text: 'continue_with', width: 320, locale: 'es' });
+  }
+</script>
+<script src="https://accounts.google.com/gsi/client" async onload="iniciar()"></script>
+</body>
+</html>
