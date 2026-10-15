@@ -1,5 +1,5 @@
 /**
- * SomosCX · Registro de clics, comentarios y preguntas sin respuesta del asistente
+ * SomosCX · Registro de clics (una fila por clic), comentarios y preguntas sin respuesta del asistente
  * Pega este código en: Sheet «SomosCX · Clics por usuario» › Extensiones › Apps Script.
  * 1) Configuración del proyecto › Propiedades del script: agrega TOKEN con una clave larga (la misma que SHEETS_TOKEN en Netlify).
  * 2) Ejecuta una vez la función «preparar» (autoriza los permisos).
@@ -24,23 +24,32 @@ function doPost(e) {
   } finally { lock.releaseLock(); }
 }
 
+function hojaClics() {
+  const c = SpreadsheetApp.openById(CLICS_ID);
+  return c.getSheetByName('Clics por día') || c.getSheets()[0];
+}
+
+/** Una fila por cada clic: Fecha | Correo | Nombre | Clics | Procesos abiertos | Última actividad | Búsquedas | Módulo | Acción */
 function registrarClics(b) {
-  const hoja = SpreadsheetApp.openById(CLICS_ID).getSheets()[0];
-  const ahora = new Date(), hoy = Utilities.formatDate(ahora, TZ, 'yyyy-MM-dd'), hora = Utilities.formatDate(ahora, TZ, 'yyyy-MM-dd HH:mm');
-  const email = String(b.email || '').toLowerCase(), clics = Number(b.clics) || 0, procs = (b.procesos || []).map(String);
-  const busq = (b.busquedas || []).map(x => String(x).toLowerCase().trim()).filter(x => x && !/\d{5,}|@/.test(x));
+  const hoja = hojaClics();
   if (!hoja.getRange('G1').getValue()) hoja.getRange('G1').setValue('Búsquedas');
-  const datos = hoja.getDataRange().getValues();
-  for (let i = 1; i < datos.length; i++) {
-    const f = datos[i][0] instanceof Date ? Utilities.formatDate(datos[i][0], TZ, 'yyyy-MM-dd') : String(datos[i][0]);
-    if (f === hoy && String(datos[i][1]).toLowerCase() === email) {
-      const set = {}; String(datos[i][4] || '').split(',').map(x => x.trim()).filter(String).concat(procs).forEach(x => set[x] = 1);
-      hoja.getRange(i + 1, 3, 1, 4).setValues([[b.nombre || datos[i][2], (Number(datos[i][3]) || 0) + clics, Object.keys(set).join(', '), hora]]);
-      if (busq.length) { const sb = {}; String(datos[i][6] || '').split(' | ').map(x => x.trim()).filter(String).concat(busq).forEach(x => sb[x] = 1); hoja.getRange(i + 1, 7).setValue(Object.keys(sb).join(' | ')); }
-      return;
-    }
+  if (!hoja.getRange('H1').getValue()) hoja.getRange('H1:I1').setValues([['Módulo', 'Acción']]);
+  const email = String(b.email || '').toLowerCase(), nombre = b.nombre || '';
+  const ev = Array.isArray(b.eventos) ? b.eventos : [];
+  const filas = ev.map(e => {
+    const f = new Date(Number(e.ts) || Date.now());
+    const proc = [String(e.proceso || ''), String(e.paso || '')].filter(String).join(' › ');
+    return [Utilities.formatDate(f, TZ, 'yyyy-MM-dd'), email, nombre, 1, proc, Utilities.formatDate(f, TZ, 'yyyy-MM-dd HH:mm:ss'),
+      String(e.busqueda || ''), String(e.modulo || ''), String(e.accion || '')];
+  });
+  // compatibilidad con la versión anterior de la página (envío agrupado)
+  if (!filas.length && (Number(b.clics) || (b.procesos || []).length)) {
+    const ahora = new Date();
+    filas.push([Utilities.formatDate(ahora, TZ, 'yyyy-MM-dd'), email, nombre, Number(b.clics) || 0, (b.procesos || []).join(', '),
+      Utilities.formatDate(ahora, TZ, 'yyyy-MM-dd HH:mm:ss'), (b.busquedas || []).join(' | '), '', '']);
   }
-  hoja.appendRow([hoy, email, b.nombre || '', clics, procs.join(', '), hora, busq.join(' | ')]);
+  if (!filas.length) return;
+  hoja.getRange(hoja.getLastRow() + 1, 1, filas.length, 9).setValues(filas);
 }
 
 function registrarFeedback(b) {
@@ -70,7 +79,7 @@ function doGet(e) {
   const p = (e && e.parameter) || {}, token = PropertiesService.getScriptProperties().getProperty('TOKEN');
   if (!token || p.token !== token) return salida({ ok: false, error: 'token' });
   if (p.tipo !== 'top') return salida({ ok: true });
-  const datos = SpreadsheetApp.openById(CLICS_ID).getSheets()[0].getDataRange().getValues(), desde = new Date(Date.now() - 30 * 864e5);
+  const datos = hojaClics().getDataRange().getValues(), desde = new Date(Date.now() - 30 * 864e5);
   const cp = {}, cb = {};
   for (let i = 1; i < datos.length; i++) {
     const f = datos[i][0] instanceof Date ? datos[i][0] : new Date(String(datos[i][0]));
@@ -87,9 +96,12 @@ function salida(o) { return ContentService.createTextOutput(JSON.stringify(o)).s
 /** Ejecútala una vez: da formato a los dos Sheets y crea el resumen por usuario. */
 function preparar() {
   const c = SpreadsheetApp.openById(CLICS_ID), hc = c.getSheets()[0];
-  hc.setName('Clics por día'); hc.setFrozenRows(1); hc.getRange('G1').setValue(hc.getRange('G1').getValue() || 'Búsquedas'); hc.getRange('A1:G1').setFontWeight('bold').setBackground('#0A0A0A').setFontColor('#FFFFFF');
+  hc.setName('Clics por día'); hc.setFrozenRows(1); hc.getRange('G1:I1').setValues([[hc.getRange('G1').getValue() || 'Búsquedas', 'Módulo', 'Acción']]); hc.getRange('A1:I1').setFontWeight('bold').setBackground('#0A0A0A').setFontColor('#FFFFFF');
   let r = c.getSheetByName('Resumen por usuario'); if (!r) r = c.insertSheet('Resumen por usuario');
-  r.getRange('A1').setFormula("=QUERY('Clics por día'!A:F, \"select B, sum(D), count(A), max(F) where B is not null group by B order by sum(D) desc label B 'Correo', sum(D) 'Clics totales', count(A) 'Días activos', max(F) 'Última actividad'\", 1)");
+  r.clear();
+  r.getRange('A1').setFormula("=QUERY('Clics por día'!A:F, \"select B, sum(D), max(F) where B is not null group by B order by sum(D) desc label B 'Correo', sum(D) 'Clics totales', max(F) 'Última actividad'\", 1)");
+  r.getRange('D1').setValue('Días activos');
+  r.getRange('D2').setFormula("=MAP(A2:A, LAMBDA(c, IF(c=\"\", \"\", COUNTUNIQUEIFS('Clics por día'!A:A, 'Clics por día'!B:B, c))))");
   r.getRange('A1:D1').setFontWeight('bold');
   const f = SpreadsheetApp.openById(FEEDBACK_ID), hf = f.getSheets()[0];
   hf.setName('Comentarios'); hf.setFrozenRows(1); hf.getRange('A1:I1').setFontWeight('bold').setBackground('#0A0A0A').setFontColor('#FFFFFF');

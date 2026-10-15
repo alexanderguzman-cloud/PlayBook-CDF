@@ -58,11 +58,13 @@
   @keyframes cfEntraIzq { from { transform: translateX(-28px); opacity: 0 } to { transform: none; opacity: 1 } }
   @keyframes cfEntra { from { transform: translateX(28px); opacity: 0 } to { transform: none; opacity: 1 } }
   @media (max-width: 1100px) { .cf-ruta { grid-template-columns: repeat(3,minmax(0,1fr)) !important; } }
-@media (max-width: 760px) { .cf-proc { padding-right: 16px !important; } .cf-ruta { grid-template-columns: 1fr !important; } .cf-ruta-det { grid-template-columns: 1fr !important; } .cf-reco { grid-template-columns: 1fr !important; } .cf-caso { grid-template-columns: 1fr !important; } .cf-cert { grid-template-columns: 1fr !important; } .cf-gl-txt { display: none; } .cf-asis { left: 8px !important; right: 8px !important; top: auto !important; bottom: 8px !important; width: auto !important; height: 82vh !important; resize: none !important; } .cf-asis-btn span:last-child { display: none; } .cf-asis-btn { padding: 0 8px !important; } .cf-diag { grid-template-columns: minmax(0,1fr) !important; } .cf-texto { position: static !important; max-width: none !important; } .cf-panel { left: 8px !important; right: 8px !important; top: auto !important; bottom: 8px !important; width: auto !important; max-height: 82vh !important; } .cf-indice, .cf-visor { position: static !important; max-width: none !important; } .cf-indice { display: none; } }
+@media (max-width: 760px) { .cf-proc { padding-right: 16px !important; } .cf-ruta { grid-template-columns: 1fr !important; } .cf-ruta-det { grid-template-columns: 1fr !important; } .cf-reco { grid-template-columns: 1fr !important; } .cf-caso { grid-template-columns: 1fr !important; } .cf-cert { grid-template-columns: 1fr !important; } .cf-gl-txt { display: none; } .cf-asis { left: 8px !important; right: 8px !important; top: auto !important; bottom: 8px !important; width: auto !important; height: 82vh !important; resize: none !important; } .cf-asis-btn span:last-child { display: none; } .cf-asis-btn { padding: 0 8px !important; } .cf-diag { grid-template-columns: minmax(0,1fr) !important; } .cf-texto { position: static !important; max-width: none !important; } .cf-panel { left: 8px !important; right: 8px !important; top: auto !important; bottom: 8px !important; width: auto !important; max-height: 82vh !important; } .cf-indice, .cf-visor { position: static !important; max-width: none !important; } .cf-indice { display: none; } .cf-pasos-btn { position: static !important; } }
 
   @media (max-width: 760px) { html, body { overflow-x: hidden; } .cx-hdr { flex-wrap: wrap !important; height: auto !important; gap: 8px !important; padding-top: 8px !important; padding-bottom: 8px !important; }
     .cx-hdr > * { flex-shrink: 0; } .cx-hdr-sub { display: none !important; } .cx-hdr-q { order: 10; flex: 1 1 100% !important; max-width: none !important; min-width: 0 !important; margin-left: 0 !important; }
     .cx-leyenda { display: none !important; } .cx-flota { display: none !important; } .cf-panel { top: auto !important; } }
+.cx-img-u { display:block; width:100%; height:320px; object-fit:contain; }
+@media (max-width: 760px) { .cx-img-u { height:220px; } }
 </style>
 </helmet>
 
@@ -838,6 +840,9 @@
                             <span style="flex:1;font-size:14px;font-weight:600">{{ panel.sal.irTxt }}</span><span style="color:#FFFFFF">→</span>
                           </button>
                         </sc-if>
+                        <sc-if value="{{ panel.sal.continua }}" hint-placeholder-val="{{ false }}">
+                          <button type="button" onClick="{{ panel.sal.seguir }}" style="display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border:1.5px solid #0A0A0A;border-radius:10px;background:#D1C973;color:#0A0A0A;cursor:pointer;text-align:left;font-family:inherit"><span style="flex:1;font-size:14px;font-weight:700">{{ panel.sal.seguirTxt }}</span><span>→</span></button>
+                        </sc-if>
                         <sc-if value="{{ panel.sal.sinIr }}" hint-placeholder-val="{{ false }}">
                           <div style="font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.1em;color:#717171">APLICA ESTA SALIDA Y FINALIZA LA GESTIÓN</div>
                         </sc-if>
@@ -924,12 +929,50 @@
                       </div>
                     </sc-if>
 
-                    <div style="position:sticky;bottom:0;display:flex;gap:8px;padding:12px 16px;border-top:1px solid #E5E5E5;background:#FFFFFF">
+                    <sc-if value="{{ panel.finFlujo }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;flex-direction:column;gap:10px;margin:4px 16px 16px;padding:14px;border:1.5px solid #0A0A0A;border-radius:12px;background:#FBF8E3">
+                        <div style="font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:9.5px;letter-spacing:.14em;color:#373737">{{ panel.tituloFin }}</div>
+                        <button type="button" onClick="{{ panel.generarNotas }}" style="height:44px;border:none;border-radius:10px;background:#0A0A0A;color:#FFFFFF;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700">{{ panel.notasBtnTxt }}</button>
+                        <sc-if value="{{ panel.verNotas }}" hint-placeholder-val="{{ false }}">
+                          <div style="border:1px solid #0A0A0A;border-radius:10px;background:#FFFFFF;overflow:hidden">
+                            <div style="display:flex;align-items:center;gap:8px;padding:7px 7px 7px 12px;background:#0A0A0A">
+                              <span style="flex:1;font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:9px;letter-spacing:.16em;color:#FFFFFF">NOTA PARA ARTEMIS</span>
+                              <button type="button" onClick="{{ panel.copiarNotas }}" style="height:26px;padding:0 10px;border:1px solid #FFFFFF;border-radius:6px;background:#FFFFFF;color:#0A0A0A;cursor:pointer;font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:9.5px;letter-spacing:.06em">{{ panel.copNotasTxt }}</button>
+                            </div>
+                            <p style="margin:0;padding:10px 14px;font-size:12px;line-height:1.5;white-space:pre-line;color:#717171;background:#F5F5F5;border-bottom:1px solid #E5E5E5;font-family:'Silka Mono','DM Mono',ui-monospace,monospace">{{ panel.notasEnc }}</p>
+                            <p style="margin:0;padding:12px 14px;font-size:13px;line-height:1.55;white-space:pre-line;font-family:'Silka Mono','DM Mono',ui-monospace,monospace">{{ panel.notasTxt }}</p>
+                          </div>
+                          <sc-if value="{{ panel.hayNotasHora }}" hint-placeholder-val="{{ false }}"><div style="font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:9.5px;letter-spacing:.1em;color:#2E7D32">✓ {{ panel.notasHoraTxt }}</div></sc-if>
+                          <sc-if value="{{ panel.hayVisita }}" hint-placeholder-val="{{ false }}">
+                            <div style="display:flex;flex-direction:column;gap:7px;padding:12px;border:1.5px dashed #0A0A0A;border-radius:10px;background:#FFFFFF">
+                              <span style="font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:9.5px;letter-spacing:.14em;color:#0A0A0A;font-weight:600">VISITA · PEGA AQUÍ LA INFORMACIÓN DE LA VISITA GENERADA</span>
+                              <textarea value="{{ panel.visitaTxt }}" onChange="{{ panel.onVisita }}" rows="3" placeholder="Ej.: Fecha y hora de inicio de la franja 09/10/2026 · 08:00" style="width:100%;padding:9px 10px;border:1px solid #CFCFCF;border-radius:8px;background:#F5F5F5;font-family:inherit;font-size:13px;line-height:1.45;resize:vertical;box-sizing:border-box"></textarea>
+                              <sc-if value="{{ panel.visitaOk }}" hint-placeholder-val="{{ false }}"><span style="align-self:flex-start;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;background:#0A0A0A;color:#FFFFFF">{{ panel.visitaDetTxt }}</span></sc-if>
+                              <sc-if value="{{ panel.visitaFalta }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:#7A5A00">No encontré la fecha y hora de inicio de la franja. Revisa que esté en el texto pegado.</span></sc-if>
+                            </div>
+                          </sc-if>
+                          <label style="display:flex;flex-direction:column;gap:5px">
+                            <span style="font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:9.5px;letter-spacing:.14em;color:#373737">NOTAS DEL ANALISTA (OPCIONAL)</span>
+                            <textarea value="{{ panel.notasAnalista }}" onChange="{{ panel.onNotasAnalista }}" rows="3" placeholder="Escribe aquí lo que quieras agregar a la nota" style="width:100%;padding:9px 10px;border:1px solid #CFCFCF;border-radius:8px;background:#FFFFFF;font-family:inherit;font-size:13.5px;line-height:1.45;resize:vertical;box-sizing:border-box"></textarea>
+                          </label>
+                          <div style="display:none">
+                          </div>
+                        </sc-if>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ panel.avisoSalto }}" hint-placeholder-val="{{ false }}">
+                      <div style="margin:0 16px 10px;padding:10px 12px;border-radius:10px;border:1px solid #E8C77A;background:#FFF0D4;font-size:13px;font-weight:600;line-height:1.4">🔒 {{ panel.avisoSaltoTxt }}</div>
+                    </sc-if>
+                    <div style="position:sticky;bottom:0;display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px;border-top:1px solid #E5E5E5;background:#FFFFFF">
+                      <sc-if value="{{ panel.bloqueado }}" hint-placeholder-val="{{ false }}">
+                        <div style="flex:1 1 100%;display:flex;align-items:center;gap:8px;font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.06em;color:#7A5A00">🔒 {{ panel.avisoBloq }}</div>
+                      </sc-if>
                       <button type="button" onClick="{{ panel.prev }}" style="height:38px;padding:0 14px;border:1px solid #CFCFCF;border-radius:9px;background:#FFFFFF;cursor:pointer;font-family:inherit;font-size:13.5px;font-weight:600;opacity:{{ panel.prevOp }}" style-hover="border-color:#0A0A0A">← Anterior</button>
                       <sc-if value="{{ panel.esPaso }}" hint-placeholder-val="{{ true }}">
+                        <sc-if value="{{ panel.hayNotasPie }}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{ panel.notasPie }}" title="Generar notas para Artemis con lo gestionado hasta ahora" style="height:38px;padding:0 10px;border:1px solid #0A0A0A;border-radius:9px;background:#FBF8E3;color:#0A0A0A;cursor:pointer;font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.06em">📝 NOTAS</button></sc-if>
                         <button type="button" onClick="{{ panel.verPagina }}" style="height:38px;padding:0 12px;border:none;border-radius:9px;background:transparent;cursor:pointer;font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:9.5px;letter-spacing:.08em;color:#717171" style-hover="color:#0A0A0A">VER EN LA PÁGINA ↓</button>
                       </sc-if>
-                      <button type="button" onClick="{{ panel.next }}" style="margin-left:auto;height:38px;padding:0 16px;border:none;border-radius:9px;background:#0A0A0A;color:#FFFFFF;cursor:pointer;font-family:inherit;font-size:13.5px;font-weight:600" style-hover="background:#373737">{{ panel.nextTxt }}</button>
+                      <button type="button" onClick="{{ panel.next }}" style="margin-left:auto;height:38px;padding:0 16px;border:none;border-radius:9px;background:{{ panel.nextFondo }};color:#FFFFFF;cursor:{{ panel.nextCursor }};font-family:inherit;font-size:13.5px;font-weight:600" style-hover="background:#373737">{{ panel.nextTxt }}</button>
                     </div>
                   </div>
                 </sc-if>
@@ -1307,8 +1350,11 @@
       </div>
 
       <div style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:34px;margin-top:52px">
+        <div class="cf-pasos-btn" style="position:sticky;top:90px;flex:none;display:{{ indiceBtnDisp }}">
+          <button type="button" onClick="{{ toggleIndice }}" title="Mostrar la lista de pasos" style="display:flex;align-items:center;gap:8px;height:40px;padding:0 14px;border:1px solid #0A0A0A;border-radius:10px;background:#0A0A0A;color:#FFFFFF;cursor:pointer;font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:10.5px;letter-spacing:.1em;white-space:nowrap" style-hover="background:#373737">☰ VER PASOS</button>
+        </div>
         <div class="cf-indice" style="position:sticky;top:90px;flex:1 1 180px;min-width:180px;max-width:220px;display:{{ indiceDisp }}">
-          <div style="font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.16em;color:#717171;margin-bottom:14px">PASOS</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px"><span style="font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.16em;color:#717171">PASOS</span><button type="button" onClick="{{ toggleIndice }}" title="Ocultar la lista de pasos" style="height:26px;padding:0 9px;border:1px solid #CFCFCF;border-radius:7px;background:#FFFFFF;color:#0A0A0A;cursor:pointer;font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:9.5px;letter-spacing:.08em" style-hover="border-color:#0A0A0A">✕ OCULTAR</button></div>
           <div style="display:flex;flex-direction:column">
             <sc-for list="{{ indice }}" as="ix" hint-placeholder-count="8">
               <div onClick="{{ ix.ir }}" style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #E5E5E5;cursor:pointer" style-hover="opacity:.6">
@@ -1323,7 +1369,6 @@
           <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-radius:12px;background:#0A0A0A;color:#FFFFFF">
             <span style="font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.16em">DETALLE DE CADA PASO · TOCA UN PASO PARA ABRIRLO</span>
             <span style="display:flex;gap:6px">
-              <button type="button" onClick="{{ toggleIndice }}" style="height:30px;padding:0 12px;border:1px solid #FFFFFF;border-radius:8px;background:transparent;color:#FFFFFF;cursor:pointer;font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em">{{ indiceTxt }}</button>
               <button type="button" onClick="{{ detAbrirTodos }}" style="height:30px;padding:0 12px;border:1px solid #FFFFFF;border-radius:8px;background:transparent;color:#FFFFFF;cursor:pointer;font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em">ABRIR TODOS</button>
               <button type="button" onClick="{{ detCerrarTodos }}" style="height:30px;padding:0 12px;border:1px solid #FFFFFF;border-radius:8px;background:#FFFFFF;color:#0A0A0A;cursor:pointer;font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em">CERRAR TODOS</button>
             </span>
@@ -1340,11 +1385,12 @@
                 <button type="button" onClick="{{ s.toggleDet }}" style="flex:none;display:flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid #0A0A0A;border-radius:9px;background:{{ s.chevFondo }};color:{{ s.chevTinta }};cursor:pointer;font-size:15px;font-weight:700">{{ s.chevDet }}</button>
               </div>
               <sc-if value="{{ s.abiertoDet }}" hint-placeholder-val="{{ false }}">
+              <div class="cf-paso-fondo" style="margin-top:16px;padding:20px;border-radius:16px;background:#EFEFEF">
 
               <sc-if value="{{ s.sinImagenes }}" hint-placeholder-val="{{ true }}">
-              <div style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:22px;margin-top:20px">
+              <div style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:22px">
                 <div style="display:flex;flex-direction:column;gap:16px;flex:1 1 340px;min-width:0;max-width:{{ s.textoMax }}">
-                  <div style="padding:20px 24px;border-left:2px solid #0A0A0A;background:#F5F5F5">
+                  <div style="padding:20px 24px;border-left:2px solid #0A0A0A;background:#FFFFFF">
                     <p style="margin:0;font-size:15px;color:#373737;text-wrap:pretty">{{ s.nota }}</p>
                   </div>
 
@@ -1370,7 +1416,7 @@
                   </sc-if>
 
                   <sc-if value="{{ s.hayImagenes }}" hint-placeholder-val="{{ false }}">
-                  <div style="padding:20px;border:1px solid #E5E5E5;border-radius:14px;background:#FFFFFF">
+                  <sc-if value="{{ s.conCheck }}" hint-placeholder-val="{{ true }}"><div style="padding:20px;border:1px solid #E5E5E5;border-radius:14px;background:#FFFFFF">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
                       <div style="font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.16em;color:#717171">{{ s.checkTitulo }}</div>
                       <div style="font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:10px;color:#717171">{{ s.progreso }}</div>
@@ -1386,7 +1432,7 @@
                         <sc-for list="{{ s.listaItems }}" as="li" hint-placeholder-count="4"><div style="display:flex;gap:10px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid #F5F5F5;font-size:14px;line-height:1.45;color:#0A0A0A"><span style="flex:none;width:6px;height:6px;margin-top:8px;border-radius:50%;background:#0A0A0A"></span><span style="text-wrap:pretty">{{ li.t }}</span></div></sc-for>
                       </div></sc-if><sc-if value="{{ s.checkTrivial }}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{ s.marcarHecho }}" style="width:100%;height:40px;margin-top:6px;border:1.5px solid #0A0A0A;border-radius:9px;background:{{ s.hechoFondo }};color:{{ s.hechoTinta }};cursor:pointer;font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:11px;font-weight:600;letter-spacing:.1em">{{ s.hechoTxt }}</button></sc-if>
                     </div>
-                  </div>
+                  </div></sc-if>
 
                   </sc-if>
 
@@ -1536,8 +1582,8 @@
                 </sc-if>
 
                 <sc-if value="{{ s.sinImagenes }}" hint-placeholder-val="{{ true }}">
-                  <div style="display:flex;flex-direction:column;gap:12px;flex:0 1 300px;min-width:260px">
-                  <div style="padding:20px;border:1px solid #E5E5E5;border-radius:14px;background:#FFFFFF">
+                  <div style="display:{{ s.colCheckDisp }};flex-direction:column;gap:12px;flex:0 1 300px;min-width:260px">
+                  <sc-if value="{{ s.conCheck }}" hint-placeholder-val="{{ true }}"><div style="padding:20px;border:1px solid #E5E5E5;border-radius:14px;background:#FFFFFF">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
                       <div style="font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.16em;color:#717171">{{ s.checkTitulo }}</div>
                       <div style="font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:10px;color:#717171">{{ s.progreso }}</div>
@@ -1553,7 +1599,7 @@
                         <sc-for list="{{ s.listaItems }}" as="li" hint-placeholder-count="4"><div style="display:flex;gap:10px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid #F5F5F5;font-size:14px;line-height:1.45;color:#0A0A0A"><span style="flex:none;width:6px;height:6px;margin-top:8px;border-radius:50%;background:#0A0A0A"></span><span style="text-wrap:pretty">{{ li.t }}</span></div></sc-for>
                       </div></sc-if><sc-if value="{{ s.checkTrivial }}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{ s.marcarHecho }}" style="width:100%;height:40px;margin-top:6px;border:1.5px solid #0A0A0A;border-radius:9px;background:{{ s.hechoFondo }};color:{{ s.hechoTinta }};cursor:pointer;font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:11px;font-weight:600;letter-spacing:.1em">{{ s.hechoTxt }}</button></sc-if>
                     </div>
-                  </div>
+                  </div></sc-if>
 
                   </div>
                 </sc-if>
@@ -1562,12 +1608,19 @@
               </sc-if>
 
               <sc-if value="{{ s.hayImagenes }}" hint-placeholder-val="{{ false }}">
-                <div style="display:flex;flex-direction:column;gap:18px;margin-top:20px">
+                <div class="cf-det-img" style="display:flex;flex-direction:column;gap:18px">
+                  <sc-if value="{{ s.hayNotaArriba }}" hint-placeholder-val="{{ true }}">
+                    <div style="padding:16px 20px;border-left:2px solid #0A0A0A;background:#FFFFFF"><p style="margin:0;font-size:14.5px;line-height:1.5;color:#373737;text-wrap:pretty;white-space:pre-line">{{ s.nota }}</p></div>
+                  </sc-if>
+                  <sc-if value="{{ s.hayVer }}" hint-placeholder-val="{{ false }}">
+                    <button type="button" onClick="{{ s.abrirVer }}" style="display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;border:1px dashed #0A0A0A;border-radius:10px;background:#FFFFFF;cursor:pointer;text-align:left;font-family:inherit" style-hover="background:#F5F5F5"><span style="flex:none;font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.12em;padding:3px 7px;border-radius:5px;background:#0A0A0A;color:#FFFFFF">{{ s.verCodigo }}</span><span style="flex:1;font-size:13.5px;font-weight:600;line-height:1.3">Paso a paso completo: {{ s.verNombre }}</span><span>→</span></button>
+                  </sc-if>
+                  <div class="cf-cap-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:18px;align-items:stretch">
                   <sc-for list="{{ s.imagenes }}" as="g" hint-placeholder-count="2">
-                    <div class="cf-fila" style="display:flex;flex-wrap:wrap;flex-direction:{{ g.dir }};align-items:{{ g.alinear }};gap:{{ g.gap }}">
+                    <div class="cf-fila" style="height:100%;display:flex;flex-direction:{{ g.dir }};align-items:{{ g.alinear }};gap:{{ g.gap }}">
                       <div class="cf-texto" style="flex:{{ g.textoFlex }};max-width:{{ g.textoMax }};min-width:0;display:flex;flex-direction:column;gap:12px;position:{{ g.pos }};top:90px">
                         <sc-if value="{{ g.hayNotaPaso }}" hint-placeholder-val="{{ false }}">
-                          <div style="padding:16px 18px;border-left:2px solid #0A0A0A;background:#F5F5F5">
+                          <div style="padding:16px 18px;border-left:2px solid #0A0A0A;background:#FFFFFF">
                             <p style="margin:0;font-size:14.5px;line-height:1.5;color:#373737;text-wrap:pretty">{{ g.notaPaso }}</p>
                           </div>
                         </sc-if>
@@ -1578,7 +1631,7 @@
                             <span>→</span>
                           </button>
                         </sc-if>
-                        <div style="display:flex;flex-direction:column;gap:8px;padding:14px 16px;border:1px solid #E5E5E5;border-radius:12px;background:#FFFFFF">
+                        <div style="flex:1 1 auto;display:flex;flex-direction:column;gap:8px;padding:14px 16px;border:1px solid #E5E5E5;border-radius:12px;background:#FFFFFF">
                           <div style="display:flex;align-items:center;gap:10px">
                             <span style="flex:none;display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#0A0A0A;color:#FFFFFF;font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:11.5px;font-weight:600">{{ g.num }}</span>
                             <span style="font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:9.5px;letter-spacing:.14em;color:#717171">{{ g.etqCaptura }}</span>
@@ -1593,7 +1646,7 @@
                       <div style="flex:{{ g.fotoFlex }};min-width:0">
                         <div onClick="{{ g.zoom }}" title="Ver en grande" style="position:relative;display:flex;align-items:center;justify-content:center;padding:14px;border:1px solid #E5E5E5;border-radius:14px;background:#F5F5F5;cursor:zoom-in" style-hover="border-color:#0A0A0A">
                           <sc-if value="{{ g.conImagen }}" hint-placeholder-val="{{ true }}">
-                            <img src="{{ g.src }}" alt="{{ g.cap }}" loading="lazy" style="display:block;width:{{ g.iw }};max-width:100%;height:auto;max-height:{{ g.ih }};object-fit:contain" />
+                            <img src="{{ g.src }}" alt="{{ g.cap }}" loading="lazy" class="cx-img-u" />
                           </sc-if>
                           <sc-if value="{{ g.sinImagen }}" hint-placeholder-val="{{ false }}">
                             <image-slot id="{{ g.slot }}" src="" fit="contain" shape="rounded" radius="10" placeholder="{{ g.placeholder }}"></image-slot>
@@ -1603,15 +1656,16 @@
                       </div>
                     </div>
                   </sc-for>
+                  </div>
 
-                  <div style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:20px">
-                    <div style="flex:1 1 260px;max-width:360px;min-width:0">
+                  <div style="display:flex;flex-direction:column;gap:18px">
+                    <sc-if value="{{ s.conCheck }}" hint-placeholder-val="{{ true }}"><div style="min-width:0">
                       <div style="padding:20px;border:1px solid #E5E5E5;border-radius:14px;background:#FFFFFF">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
                       <div style="font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.16em;color:#717171">{{ s.checkTitulo }}</div>
                       <div style="font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:10px;color:#717171">{{ s.progreso }}</div>
                     </div>
-                    <div style="display:flex;flex-direction:column">
+                    <div class="cf-check-h" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));column-gap:28px">
                       <sc-if value="{{ s.checkReal }}" hint-placeholder-val="{{ true }}"><sc-for list="{{ s.checklist }}" as="c" hint-placeholder-count="4">
                         <div onClick="{{ c.toggle }}" style="display:flex;align-items:flex-start;gap:12px;padding:11px 2px;border-bottom:1px solid #E5E5E5;cursor:pointer">
                           <span style="display:flex;align-items:center;justify-content:center;width:19px;height:19px;flex:none;border-radius:5px;font-size:11px;border:1px solid {{ c.borde }};background:{{ c.fondo }};color:#FFFFFF">{{ c.marca }}</span>
@@ -1623,8 +1677,8 @@
                       </div></sc-if><sc-if value="{{ s.checkTrivial }}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{ s.marcarHecho }}" style="width:100%;height:40px;margin-top:6px;border:1.5px solid #0A0A0A;border-radius:9px;background:{{ s.hechoFondo }};color:{{ s.hechoTinta }};cursor:pointer;font-family:'Silka Mono','DM Mono',ui-monospace,monospace;font-size:11px;font-weight:600;letter-spacing:.1em">{{ s.hechoTxt }}</button></sc-if>
                     </div>
                   </div>
-                    </div>
-                    <div style="flex:2.6 1 460px;min-width:0;display:flex;flex-direction:column;gap:16px">
+                    </div></sc-if>
+                    <div style="min-width:0;display:flex;flex-direction:column;gap:18px">
                   <sc-if value="{{ s.hayScripts }}" hint-placeholder-val="{{ false }}">
                     <div style="display:flex;flex-direction:column;gap:10px">
                       <sc-for list="{{ s.scripts }}" as="sc" hint-placeholder-count="1">
@@ -1742,6 +1796,7 @@
                   </div>
                 </div>
               </sc-if>
+                            </div>
               </sc-if>
             </div>
           </sc-for>
@@ -3838,11 +3893,11 @@ class Component extends DCLogic {
 
   abrirProceso(cod) {
     try { this._cxProc && this._cxProc(cod); } catch (e) {}
-    try { const qq = this.state.q || (this.state.vista === 'resultados' ? this.state.rq : ''); if (qq && this._cxBusq) this._cxBusq(qq); } catch (e) {}
+    
     const p = this.procDe(cod);
     try { const A = JSON.parse(localStorage.getItem('cx-abiertos') || '{}'); A[cod] = (A[cod] || 0) + 1; localStorage.setItem('cx-abiertos', JSON.stringify(A)); } catch (e) {}
     try { document.activeElement && document.activeElement.blur && document.activeElement.blur(); } catch (e) {}
-    this.setState({ qFoco: false, vista: 'proceso', zoom: null, bancoOpen: false, tema: p.tema, proc: cod, paso: 0, buscador: false, menuTemas: false, diagrama: this.modoFlujo() === 'completo', q: '', sq: '', copiado: false, check: {}, panel: null, gates: {}, vistos: {}, pcop: '', escF: {}, escChk: {}, escPegado: '', asis: false });
+    this.setState({ qFoco: false, vista: 'proceso', zoom: null, bancoOpen: false, tema: p.tema, proc: cod, paso: 0, buscador: false, menuTemas: false, diagrama: this.modoFlujo() === 'completo', q: '', sq: '', copiado: false, check: {}, panel: null, gates: {}, vistos: {}, saltos: {}, notasArt: false, notasAnalista: '', notasHora: '', visitaPegada: '', pcop: '', escF: {}, escChk: {}, escPegado: '', asis: false });
     window.scrollTo(0, 0);
   }
 
@@ -3907,13 +3962,31 @@ class Component extends DCLogic {
   }
 
   componentDidMount() {
-    if (window.CX_NETLIFY && !window._cxTrack) { window._cxTrack = true; let n = 0, procs = [], busq = [];
-      document.addEventListener('click', () => { n++; }, true);
-      this._cxBusq = q => { const t = String(q || '').toLowerCase().replace(/\s+/g, ' ').trim(); if (t.length < 3 || t.length > 60 || /\d{5,}|@/.test(t) || busq.includes(t)) return; busq.push(t); };
-      this._cxProc = c => { if (!c) return; let p = null; try { p = this.procesos.find(x => x.codigo === c); } catch (e) {} const et = p ? c + ' · ' + this.corto(p) : c; if (!procs.includes(et)) procs.push(et); };
-      const enviar = () => { if (!n && !procs.length && !busq.length) return; const b = JSON.stringify({ clics: n, procesos: procs, busquedas: busq }); n = 0; procs = []; busq = [];
+    if (window.CX_NETLIFY && !window._cxTrack) { window._cxTrack = true; let cola = [];
+      const limpio = v => String(v || '').replace(/\s+/g, ' ').trim();
+      const seguro = v => { const t = limpio(v); return /\d{6,}|@|https?:\/\//i.test(t) ? '' : t.slice(0, 90); };
+      const MOD = { inicio: 'Inicio', proceso: 'Proceso', paso: 'Paso a paso', glosario: 'Glosario', guiones: 'Guiones', equipos: 'Equipos', resultados: 'Búsqueda', tema: 'Grupo de procesos', macro: 'Grupo de procesos', escalamientos: 'Escalamientos', enlaces: 'Enlaces', certificacion: 'Certificación', simulador: 'Practicar con un caso' };
+      const contexto = () => { const st = this.state || {}; let proc = '', paso = '';
+        try { if (st.proc && ['proceso', 'paso'].includes(st.vista)) { const p = this.procesos.find(x => x.codigo === st.proc); proc = p ? p.codigo + ' · ' + this.corto(p) : st.proc;
+          if (st.panel && typeof st.panel.k === 'number') { const L = this.pasosDe(p); if (L[st.panel.k]) paso = 'Paso ' + L[st.panel.k].n + ' · ' + L[st.panel.k].titulo; } } } catch (e) {}
+        return { modulo: MOD[st.vista] || limpio(st.vista || 'Inicio'), proceso: proc, paso }; };
+      const enviar = () => { if (!cola.length) return; const b = JSON.stringify({ eventos: cola.splice(0, 200) });
         try { if (!(navigator.sendBeacon && navigator.sendBeacon('/api/evento', new Blob([b], { type: 'application/json' })))) fetch('/api/evento', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: b, keepalive: true }); } catch (e) {} };
-      setInterval(enviar, 120000); window.addEventListener('pagehide', enviar); document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') enviar(); }); }
+      const evento = (accion, extra) => { const c = contexto(); cola.push({ ts: Date.now(), modulo: c.modulo, proceso: c.proceso, paso: c.paso, accion: seguro(accion) || 'Clic', busqueda: '', ...(extra || {}) }); if (cola.length >= 40) enviar(); };
+      this._cxEvt = evento;
+      document.addEventListener('click', e => { try {
+        const t = e.target; if (!t || !t.closest) return;
+        const el = t.closest('button, a, input, textarea, select, label, [title]') || t;
+        let txt = '';
+        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') txt = 'Campo: ' + (el.getAttribute('placeholder') || el.getAttribute('aria-label') || el.name || 'texto');
+        else txt = limpio(el.innerText || el.textContent || '').split(' ').slice(0, 12).join(' ') || (el.getAttribute && (el.getAttribute('title') || el.getAttribute('aria-label'))) || '';
+        const zona = t.closest('.cf-asis') ? 'Asistente' : t.closest('.cf-panel') ? 'Panel del flujo' : t.closest('header') ? 'Menú superior' : '';
+        evento((zona ? zona + ' › ' : '') + txt);
+      } catch (er) {} }, true);
+      this._cxBusq = q => { const t = limpio(q).toLowerCase(); if (t.length < 3 || t.length > 80 || /\d{5,}|@/.test(t)) return; evento('Consulta en el buscador', { busqueda: t }); };
+      this._cxAsis = q => { const t = limpio(q); if (t.length < 2 || /\d{6,}|@/.test(t)) return; evento('Consulta al asistente', { busqueda: t.slice(0, 120), modulo: 'Asistente' }); };
+      this._cxProc = c => { if (!c) return; let p = null; try { p = this.procesos.find(x => x.codigo === c); } catch (e) {} evento('Abrió el proceso ' + (p ? c + ' · ' + this.corto(p) : c), { proceso: p ? c + ' · ' + this.corto(p) : c, modulo: 'Proceso' }); };
+      setInterval(enviar, 20000); window.addEventListener('pagehide', enviar); document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') enviar(); }); }
     this.aplicarZoom(); window.addEventListener('resize', () => { clearTimeout(this._zr); this._zr = setTimeout(() => this.aplicarZoom(), 150); });
     try { const ap = JSON.parse(localStorage.getItem('cx-asis-pos') || 'null'); if (ap && typeof ap.x === 'number') this.setState({ asisPos: ap }); } catch (e) {}
     const guardar = pos => { try { localStorage.setItem('cx-asis-pos', JSON.stringify(pos)); } catch (e) {} this.setState({ asisPos: pos }); };
@@ -4108,6 +4181,7 @@ class Component extends DCLogic {
   }
 
   irResultados(q) {
+    try { this._cxBusq && this._cxBusq(q); } catch (e) {}
     this.setState({ vista: 'resultados', rq: String(q || '').trim(), rgrupo: 'Todos', q: '', qSel: -1, qFoco: false, menuTemas: false, buscador: false });
     window.scrollTo(0, 0);
   }
@@ -4801,7 +4875,7 @@ class Component extends DCLogic {
     pasos.forEach((x, j) => { if (!x.rama && !orden.includes(j)) orden.push(j); });
     const completo = j => { const x = pasos[j]; if (!x) return false; const cl = x.checklist || []; return cl.length ? cl.every((_, q) => s.check[x.n + '-' + q]) : !!vistos[j]; };
     const arriba = () => setTimeout(() => { try { const el = document.querySelector('.cf-panel'); if (el) el.scrollTop = 0; } catch (e) {} }, 0);
-    const abrirPaso = j => { this.setState(st => ({ panel: { k: j }, vistos: { ...(st.vistos || {}), [j]: true } })); arriba(); };
+    const abrirPaso = j => { this.abrirPasoFlujo(j); arriba(); };
     const abrirAntes = () => { this.setState(st => ({ panel: { k: 'antes' }, vistos: { ...(st.vistos || {}), antes: true } })); arriba(); };
     const activo = pn && typeof pn.k === 'number' ? pn.k : -1;
     const partes = []; { let cur = null; todas.forEach((r, i) => { if (r.esRama) { cur = { i, tag: r.tag, pasos: [], n: partes.length + 1 }; partes.push(cur); } else if (r.esPaso && cur) (r.grupo || [r.idx]).forEach(j => { if (!cur.pasos.includes(j)) cur.pasos.push(j); }); }); }
@@ -4836,16 +4910,21 @@ class Component extends DCLogic {
         let prevPaso = -1; for (let q = i - 1; q >= 0; q--) if (todas[q].esPaso) { prevPaso = q; break; }
         let sigPaso = -1; for (let q = i + 1; q < todas.length; q++) { if (todas[q].esRama) break; if (todas[q].esPaso) { sigPaso = todas[q].idx; break; } }
         const sal = r.salida || {};
+        const grpG = prevPaso >= 0 ? (todas[prevPaso].grupo || [todas[prevPaso].idx]) : [], posG = grpG.length ? orden.indexOf(grpG[grpG.length - 1]) : -1;
+        const sigOrden = posG >= 0 && posG + 1 < orden.length ? orden[posG + 1] : -1, contSal = /contin[uú]a|sigue con|luego sigue|y sigue/i.test(String(sal.titulo || '') + ' ' + String(sal.nota || ''));
         const scSal = this.scriptSalida(pasos, todas, i, sal);
-        const irFn = sal.ir ? () => this.abrirProceso(sal.ir) : (sal.paso !== undefined ? () => abrirPaso(sal.paso) : null);
+        const irFn = sal.ir ? () => this.abrirProceso(sal.ir) : (sal.paso !== undefined ? () => this.setState(st => ({ saltos: { ...(st.saltos || {}), [sal.paso]: true }, panel: { k: sal.paso } })) : null);
         const irTxt = sal.ir ? 'Abrir ' + sal.ir + ' · ' + this.procDe(sal.ir).nombre : (sal.paso !== undefined && pasos[sal.paso] ? 'Ir al paso ' + pasos[sal.paso].n + ' · ' + pasos[sal.paso].titulo : '');
         const resSigue = () => this.setState(st => { const g = { ...(st.gates || {}) }; if (g[key] === 'sigue') { delete g[key]; return { gates: g }; } g[key] = 'sigue';
-          return { gates: g, panel: sigPaso >= 0 ? { k: sigPaso } : null, vistos: sigPaso >= 0 ? { ...(st.vistos || {}), [sigPaso]: true } : (st.vistos || {}) }; });
-        const resSale = () => { if (scSal && (this.state.gates || {})[key] !== 'sale') this.copiarTxt(scSal.texto, 'sal-' + key); this.setState(st => { const g = { ...(st.gates || {}) }; if (g[key] === 'sale') { delete g[key]; return { gates: g }; } g[key] = 'sale'; return { gates: g, panel: { k: 'salida', g: key } }; }); };
+          return { gates: g, panel: sigPaso >= 0 ? { k: sigPaso } : (sigOrden >= 0 ? { k: sigOrden } : st.panel), vistos: (() => { const v2 = { ...(st.vistos || {}) }; if (prevPaso >= 0) (todas[prevPaso].grupo || [todas[prevPaso].idx]).forEach(j => { v2[j] = true; }); return v2; })() }; });
+        const resSale = () => { if (scSal && (this.state.gates || {})[key] !== 'sale') this.copiarTxt(scSal.texto, 'sal-' + key); this.setState(st => { const g = { ...(st.gates || {}) }; if (g[key] === 'sale') { delete g[key]; return { gates: g }; } g[key] = 'sale'; const v2 = { ...(st.vistos || {}) }; if (prevPaso >= 0) (todas[prevPaso].grupo || [todas[prevPaso].idx]).forEach(j => { v2[j] = true; }); return { gates: g, vistos: v2, panel: { k: 'salida', g: key } }; }); };
         const copSal = s.pcop === 'sal-' + key;
         salidas[key] = { ...this.escBoton(String(sal.titulo || '') + ' ' + String(sal.nota || ''), r.pregunta + ' → ' + r.etqSale + ': ' + (sal.titulo || ''), prevPaso >= 0 ? todas[prevPaso].idx : null), hayScript: !!scSal, script: scSal ? { etiqueta: scSal.etiqueta || scSal.nombre || 'Guion', texto: scSal.texto, copTxt: copSal ? 'COPIADO ✓' : 'COPIAR', copFondo: copSal ? '#E5E5E5' : 'transparent', copTinta: copSal ? '#0A0A0A' : '#FFFFFF', copBorde: copSal ? '#0A0A0A' : '#555555', copiar: () => this.copiarTxt(scSal.texto, 'sal-' + key) } : {},
           avisoCopia: copSal ? 'Mensaje copiado: pégalo en el chat del cliente' : 'Mensaje listo para copiar', pregunta: r.pregunta, respuesta: r.etqSale, tag: sal.tag, titulo: sal.titulo, nota: sal.nota || '', hayNota: !!sal.nota, hayIr: !!irFn, sinIr: !irFn, ir: irFn || (() => {}), irTxt,
           cambiar: () => this.setState(st => { const g = { ...(st.gates || {}) }; delete g[key]; return { gates: g, panel: prevPaso >= 0 ? { k: todas[prevPaso].idx } : null }; }) };
+        salidas[key].continua = contSal; if (contSal) salidas[key].sinIr = false;
+        salidas[key].seguirTxt = sigOrden >= 0 && pasos[sigOrden] ? 'Continuar con el paso ' + pasos[sigOrden].n + ' · ' + pasos[sigOrden].titulo : 'Continuar el flujo';
+        salidas[key].seguir = () => this.setState(st => ({ panel: sigOrden >= 0 ? { k: sigOrden } : st.panel }));
         const G = { key, pista: r.pista || '', pregunta: r.pregunta, etqSigue: r.etqSigue, etqSale: r.etqSale, saleTag: sal.tag || 'SALIDA', resSigue, resSale,
           fSigue: resp === 'sigue' ? '#0A0A0A' : 'rgba(255,255,255,.65)', tSigue: resp === 'sigue' ? '#FFFFFF' : '#0A0A0A',
           fSale: resp === 'sale' ? '#0A0A0A' : 'rgba(255,255,255,.65)', tSale: resp === 'sale' ? '#FFFFFF' : '#0A0A0A' };
@@ -4853,7 +4932,7 @@ class Component extends DCLogic {
         const out = { ...base, ...G, sombra: resp ? '0 0 0 2px #0A0A0A' : (i === this._posS ? '0 0 0 3px #0A0A0A' : 'none'), linea: resp === 'sale' ? '#E5E5E5' : '#A9A9A9',
           salida: { ...sal, hayScript: false, scChip: s.pcop === 'sal-' + key ? '✓ MENSAJE COPIADO' : '💬 GUION: ' + ((scSal && (scSal.nombre || scSal.etiqueta)) || 'para el cliente').toUpperCase() + ' · TOCA PARA VER', abrirPanel: () => this.setState({ panel: { k: 'salida', g: key } }),
             fondo: resp === 'sale' ? '#FFFFFF' : '#F5F5F5', sombra: resp === 'sale' ? '0 0 0 2px #0A0A0A' : 'none', opac: resp === 'sigue' ? '.35' : '1' } };
-        if (resp === 'sale') apagado = true;
+        if (resp === 'sale' && !contSal) apagado = true;
         return out;
       }
       return base;
@@ -4900,7 +4979,7 @@ class Component extends DCLogic {
       const sl = salidas[pn.g];
       panel = { esPaso: false, esAntes: false, esSalida: true, p: {}, titulo: sl.titulo || 'Salida del flujo', marca: '◆', numFondo: '#E5E5E5', numTinta: '#0A0A0A',
         contador: 'SALIDA DEL FLUJO' + (sl.tag ? ' · ' + sl.tag : ''), hayCheck: false, hayGate: false, gate: {}, scripts: [], antes: [], sal: sl,
-        prev: sl.cambiar, prevOp: '1', next: () => this.setState({ panel: null }), nextTxt: 'Cerrar panel', verPagina: () => {} };
+        prev: sl.cambiar, prevOp: '1', next: sl.continua ? sl.seguir : () => this.setState({ panel: null }), nextTxt: sl.continua ? 'Continuar →' : 'Cerrar panel', verPagina: () => {} };
     }
     if (pn && pn.k === 'escalar') panel = this.panelEscalar(proc, pasos, todas, gates, pn, orden);
     panel = { esEscalar: false, exc: [], escPaso: { hayEsc: false }, esc: { tipos: [], requisitos: [], campos: [], grupos: [] }, ...panel };
@@ -4911,6 +4990,57 @@ class Component extends DCLogic {
     panel.hayParte = false; panel.parte = '';
     if (panel.esPaso && pn && typeof pn.k === 'number') { const pt = partes.find(x => x.pasos.includes(pn.k)); if (pt) { panel.hayParte = true; panel.parte = (partes.length > 1 ? 'PARTE ' + pt.n + ' DE ' + partes.length + ' · ' : '') + this.frase(pt.tag); } }
     if (panel._sacEsc) panel.escPaso = { hayEsc: true, escTxt: '⇪ TICKET', escalar: () => this.setState({ panel: { k: 'escalar', tipo: 'TICKET', motivo: '', desde: pn.k } }) };
+    { // v96 · flujo obligatorio + notas para Artemis
+      const ultimoDeGrupo = j => { const row = todas.find(r => r.esPaso && (r.grupo || [r.idx]).includes(j)); const g = row ? (row.grupo || [row.idx]) : [j]; return g[g.length - 1] === j; };
+      const gateDe = j => (gatePorPaso[j] && ultimoDeGrupo(j)) ? gatePorPaso[j] : null;
+      const listo = j => { const g = gateDe(j); return g ? !!gates[g.key] : completo(j); };
+      const saltos = s.saltos || {}; let ini = 0; orden.forEach((j, q) => { if (saltos[j]) ini = Math.max(ini, q); });
+      let pend = -1; for (let q = ini; q < orden.length; q++) { if (!listo(orden[q])) { pend = q; break; } }
+      this._flujoPend = pend >= 0 ? orden[pend] : null;
+      this._flujoPerm = j => { const q = orden.indexOf(j); return q < 0 || !!saltos[j] || pend < 0 || q <= pend; };
+      const salidaKey = (() => { let k2 = null; todas.forEach(r => { if (r.esGate && gates[r.key] === 'sale' && !(salidas[r.key] && salidas[r.key].continua)) k2 = r.key; }); return k2; })();
+      const notasEnc = () => { const f = new Date(), dd = n => String(n).padStart(2, '0'), an = s.sesion ? (s.sesion.nombre || s.sesion.email || '') : '';
+        return ['Gestión: ' + proc.codigo + ' · ' + proc.nombre, 'Fecha: ' + dd(f.getDate()) + '/' + dd(f.getMonth() + 1) + '/' + f.getFullYear() + ' ' + dd(f.getHours()) + ':' + dd(f.getMinutes())].concat(an ? ['Analista: ' + an] : []).join('\n'); };
+      const vis = (() => { const pegado = String(s.visitaPegada || ''), esc = this._escUlt && this._escUlt.proc === proc.codigo ? this._escUlt : null;
+        const hay = !!(esc && esc.tipo === 'VISITA') || orden.some(j => listo(j) && /visita/i.test((pasos[j] || {}).titulo || '')) || (pn && pn.k === 'escalar' && pn.tipo === 'VISITA') || !!pegado.trim();
+        const t = pegado.replace(/\s+/g, ' '); let m = /inicio de la franja\s*:?\s*(\d{1,2}\/\d{1,2}\/\d{2,4})\s*[·\-–,]?\s*(\d{1,2}:\d{2}(?:\s*[ap]\.?\s?m\.?)?)?/i.exec(t);
+        if (!m) { const d = /(\d{1,2}\/\d{1,2}\/\d{2,4})/.exec(t), hh = d ? /(\d{1,2}:\d{2}(?:\s*[ap]\.?\s?m\.?)?)/i.exec(t.slice(d.index)) : null; m = d ? [null, d[1], hh ? hh[1] : ''] : null; }
+        return { hay, fecha: m ? m[1] : '', hora: m && m[2] ? m[2].trim() : '' }; })();
+      const notasTxt = () => {
+        const L = ['Validaciones realizadas:'];
+        orden.slice().sort((a, b) => a - b).forEach(j => { if (!listo(j)) return; const g = gateDe(j); if (g && gates[g.key]) L.push('- ' + g.pregunta + ' → ' + (gates[g.key] === 'sigue' ? g.etqSigue : g.etqSale)); else if (pasos[j]) L.push('- ' + pasos[j].titulo + ': realizado'); });
+        if (vis.hay && vis.fecha) L.push('- Visita agendada · inicio de la franja: ' + vis.fecha + (vis.hora ? ' · ' + vis.hora : ''));
+        { const nombreEsc = t => t === 'VISITA' ? 'Visita técnica agendada' : t === 'TICKET' ? 'Ticket creado' : 'Escalamiento a ' + t;
+          if (escU) L.push('- Gestión: ' + nombreEsc(escU.tipo) + (escU.motivo ? ' · Motivo: ' + escU.motivo : ''));
+          else if (salidaKey && salidas[salidaKey]) L.push('- Gestión: ' + (salidas[salidaKey].titulo || 'Salida del flujo'));
+          else if (vis.hay) L.push('- Gestión: visita técnica agendada'); else if (pend < 0) L.push('- Gestión: solución en primer contacto'); }
+        L.push(''); L.push('Notas del analista: ' + String(s.notasAnalista || '').trim());
+        return L.join('\n'); };
+      if (pn && pn.k === 'escalar') { const tps = this.escTipos(proc), tp = tps.includes(pn.tipo) ? pn.tipo : tps[0], F = s.escF || {};
+        const mot = F[tp + '|Motivo'] !== undefined ? F[tp + '|Motivo'] : (pn.motivo || ''); this._escUlt = { proc: proc.codigo, tipo: tp, motivo: String(mot || '').trim() }; }
+      const escU = this._escUlt && this._escUlt.proc === proc.codigo && s.notasArt !== 'x' ? this._escUlt : null;
+      const hechos1 = orden.some(j => listo(j));
+      const fin = (!!panel.esSalida && !(panel.sal && panel.sal.continua)) || pend < 0 || !!panel.esEscalar || !!s.notasArt;
+      const verN = !!s.notasArt, txt = verN ? notasTxt() : '', enc = verN ? notasEnc() : '', copN = s.pcop === 'notas-art';
+      Object.assign(panel, { bloqueado: false, avisoBloq: '', nextFondo: '#0A0A0A', nextCursor: 'pointer', finFlujo: fin, hayNotasPie: hechos1 && !fin, notasPie: () => this.setState({ notasArt: true }), tituloFin: panel.esEscalar ? 'ESCALAMIENTO · DEJA LA NOTA EN ARTEMIS' : (pend < 0 || panel.esSalida ? 'FLUJO FINALIZADO · TUS RESPUESTAS QUEDARON REGISTRADAS' : 'NOTA DE LO GESTIONADO HASTA AHORA'), verNotas: verN, notasTxt: txt, notasEnc: enc, notasAnalista: s.notasAnalista || '', onNotasAnalista: e => this.setState({ notasAnalista: e.target.value }),
+        generarNotas: () => { const f = new Date(); this.setState({ notasArt: true, notasHora: String(f.getHours()).padStart(2, '0') + ':' + String(f.getMinutes()).padStart(2, '0') + ':' + String(f.getSeconds()).padStart(2, '0') }); },
+        hayNotasHora: verN && !!s.notasHora, notasHoraTxt: 'NOTA ACTUALIZADA A LAS ' + (s.notasHora || '') + ' · ' + orden.filter(j => listo(j)).length + ' PASOS REGISTRADOS',
+        hayVisita: verN && vis.hay, visitaTxt: s.visitaPegada || '', onVisita: e => this.setState({ visitaPegada: e.target.value }), visitaOk: !!vis.fecha, visitaFalta: !!(s.visitaPegada || '').trim() && !vis.fecha,
+        visitaDetTxt: vis.fecha ? 'DETECTÉ · ' + vis.fecha + (vis.hora ? ' · ' + vis.hora : '') : '',
+        copiarNotas: () => this.copiarTxt(notasTxt(), 'notas-art'), copNotasTxt: copN ? 'COPIADO ✓' : 'COPIAR NOTA',
+        notasBtnTxt: verN ? '📝 Notas generadas · actualizar' : '📝 Generar notas para Artemis',
+        avisoSalto: !!s.avisoFlujo, avisoSaltoTxt: this._flujoPend != null && pasos[this._flujoPend] ? 'Primero completa el paso ' + pasos[this._flujoPend].n + ' · ' + pasos[this._flujoPend].titulo : '' });
+      if (panel.esPaso && pn && typeof pn.k === 'number') {
+        const k = pn.k, q = orden.indexOf(k), ok = listo(k), g = gateDe(k), cl = (pasos[k] || {}).checklist || [];
+        panel.bloqueado = !ok;
+        panel.avisoBloq = g ? 'Responde la pregunta para continuar' : (cl.length > 1 ? 'Marca todas las confirmaciones para continuar' : (cl.length === 1 ? 'Marca la confirmación para continuar' : 'Marca «Paso hecho» para continuar'));
+        panel.nextFondo = ok ? '#0A0A0A' : '#BDBDBD'; panel.nextCursor = ok ? 'pointer' : 'not-allowed';
+        const nx = panel.next, ultimo = q >= orden.length - 1;
+        panel.next = () => { if (!listo(k)) { this.setState({ avisoFlujo: Date.now() }); clearTimeout(this._avT); this._avT = setTimeout(() => this.setState({ avisoFlujo: 0 }), 3500); return; }
+          if (ultimo || pend < 0) { this.setState({ notasArt: true }); return; } nx(); };
+        if (ultimo && ok) panel.nextTxt = 'Terminar ✓';
+      }
+    }
     const abierto = !!panel.titulo;
     return { hayPartes: partes.length > 1, textoPartes: 'ESTE FLUJO TIENE ' + partes.length + ' PARTES · TOCA LA QUE NECESITAS',
       partesFlujo: partes.map(pt => { const act = pt.pasos.includes(activo); return { n: String(pt.n), titulo: this.frase(pt.tag), pasos: pt.pasos.length + (pt.pasos.length === 1 ? ' paso' : ' pasos'),
@@ -4918,8 +5048,15 @@ class Component extends DCLogic {
       antesArriba: v.hayAntes && !v.diagramaAbierto, columnas, flujoCols: corto ? 'minmax(0,620px)' : 'repeat(' + columnas.length + ',minmax(0,1fr))',
       panelAbierto: abierto, panel, cerrarPanel: () => this.setState({ panel: null }),
       progresoTxt: hechos + ' DE ' + total + ' PASOS VERIFICADOS', progresoPct: (total ? Math.round(hechos * 100 / total) : 0) + '%', rutaGates,
-      reiniciarCaso: () => this.setState({ check: {}, gates: {}, vistos: {}, panel: null, pcop: '', fotoSel: {}, escF: {}, escChk: {}, escPegado: '' }),
+      reiniciarCaso: () => this.setState({ check: {}, gates: {}, vistos: {}, saltos: {}, notasArt: false, notasAnalista: '', notasHora: '', visitaPegada: '', panel: null, pcop: '', fotoSel: {}, escF: {}, escChk: {}, escPegado: '' }),
       escalarCaso: () => this.setState({ panel: { k: 'escalar', tipo: this.escTipos(proc)[0], motivo: '', desde: pn && typeof pn.k === 'number' ? pn.k : null } }) };
+  }
+
+  abrirPasoFlujo(k) {
+    if (this._flujoPerm && !this._flujoPerm(k)) {
+      const pj = this._flujoPend; this.setState(st => ({ avisoFlujo: Date.now(), panel: pj != null ? { k: pj } : st.panel }));
+      clearTimeout(this._avT); this._avT = setTimeout(() => this.setState({ avisoFlujo: 0 }), 3500); return; }
+    this.setState({ panel: { k } });
   }
 
   aplicarAccesoN2() {
@@ -4936,9 +5073,10 @@ class Component extends DCLogic {
   aplicarTema(t) { try { document.documentElement.classList.toggle('cx-oscuro', t === 'oscuro'); const m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', '#0A0A0A'); } catch (e) {} }
   renderVals() {
     const o = this.renderVals82(), st = this.state;
-    { const oc = st.indiceOculto === undefined ? (() => { try { return localStorage.getItem('cx-indice') === 'oculto'; } catch (e) { return false; } })() : st.indiceOculto;
-      o.indiceDisp = oc ? 'none' : 'block'; o.indiceTxt = oc ? 'MOSTRAR ÍNDICE' : 'OCULTAR ÍNDICE';
-      o.toggleIndice = () => { const n = !oc; try { localStorage.setItem('cx-indice', n ? 'oculto' : 'visible'); } catch (e) {} this.setState({ indiceOculto: n }); }; }
+    { const oc = st.indiceOculto === undefined ? true : st.indiceOculto;
+      o.indiceDisp = oc ? 'none' : 'block'; o.indiceBtnDisp = oc ? 'block' : 'none'; o.indiceTxt = oc ? 'MOSTRAR ÍNDICE' : 'OCULTAR ÍNDICE';
+      o.toggleIndice = () => this.setState({ indiceOculto: !oc });
+      if (Array.isArray(o.pasosDetalle)) o.pasosDetalle.forEach(s => { s.conCheck = !!(s.checkReal || s.esLista); s.colCheckDisp = s.conCheck ? 'flex' : 'none'; if (!s.conCheck) s.textoMax = 'none'; s.hayNotaArriba = !!(s.hayImagenes && s.nota); (s.imagenes || []).forEach(g => Object.assign(g, { hayNotaPaso: false, hayVerAqui: false, dir: 'column', alinear: 'stretch', gap: '10px', textoMax: 'none', pos: 'static', textoFlex: '1 1 auto', fotoFlex: '0 0 auto' })); }); }
     { let pk = ''; try { pk = st.panel ? JSON.stringify({ k: st.panel.k, a: st.panel.antes, s: st.panel.sal, t: st.panel.tipo }) : ''; } catch (e) {}
       if (pk !== this._pkPrev) { this._pkPrev = pk; if (pk) setTimeout(() => { try { const el = document.querySelector('.cf-panel'); if (el) el.scrollTop = 0; } catch (e) {} }, 0); } }
     return o;
@@ -4992,7 +5130,7 @@ class Component extends DCLogic {
       _x.asisAbierto = !!st.asis && !!st.sesion; _x.asisCerrado = !st.asis && !!st.sesion;
       _x.toggleAsis = () => this.setState(s2 => ({ asis: !s2.asis })); _x.cerrarAsis = () => this.setState({ asis: false });
       _x.asisTexto = st.asisQ || ''; _x.onAsis = e => this.setState({ asisQ: e.target.value });
-      const enviar = (t) => { t = String(t || '').trim(); if (!t) return; this.setState(s2 => ({ asisMsgs: (s2.asisMsgs || []).concat([t]).slice(-8), asisQ: '' }));
+      const enviar = (t) => { t = String(t || '').trim(); if (!t) return; try { this._cxAsis && this._cxAsis(t); } catch (e) {} this.setState(s2 => ({ asisMsgs: (s2.asisMsgs || []).concat([t]).slice(-8), asisQ: '' }));
         setTimeout(() => { try { const el = document.querySelector('.cf-asis-msgs'), ms = el ? el.querySelectorAll('.cf-asis-msg') : []; const last = ms[ms.length - 1]; if (el && last) el.scrollTop = last.offsetTop - el.offsetTop - 8; } catch (e) {} }, 40); };
       _x.asisEnviar = () => enviar(st.asisQ); _x.onAsisKey = e => { if (e.key === 'Enter') { e.preventDefault && e.preventDefault(); enviar(e.target.value); } };
       _x.asisVacio = msgs.length === 0; _x.asisLimpiar = () => this.setState({ asisMsgs: [] });
@@ -5104,7 +5242,7 @@ class Component extends DCLogic {
         if (sel >= 0) { const e = R[sel]; _x.hayRutaSel = true;
           _x.rutaSel = { n: String(sel + 1).padStart(2, '0'), titulo: e.titulo, resumen: e.resumen, detalle: (e.detalle || []).map(t => ({ t })), decisiones: decDe(e, sel), hayDec: decDe(e, sel).length > 0,
             scripts: (() => { const vis = {}, L = []; e.pasos.forEach(k => ((pasos[k] || {}).scripts || []).forEach(sc => { if (sc && sc.texto && !vis[sc.texto]) { vis[sc.texto] = 1; L.push(sc); } })); return L.map((sc, q) => ({ nombre: sc.nombre || sc.etiqueta || 'Guion', texto: sc.texto, ...cop(sc.texto, 'rs-' + st.proc + '-' + sel + '-' + q) })); })(),
-            pasos: e.pasos.filter(k => pasos[k]).map(k => ({ n: pasos[k].n, titulo: pasos[k].titulo, fondo: k === pk ? '#0A0A0A' : '#FFFFFF', tinta: k === pk ? '#FFFFFF' : '#0A0A0A', numF: k === pk ? '#FFFFFF' : '#0A0A0A', numT: k === pk ? '#0A0A0A' : '#FFFFFF', marca: k === pk ? '● ESTÁS AQUÍ' : '↗', ir: () => this.setState(s2 => ({ panel: { k }, vistos: { ...(s2.vistos || {}), [k]: true } })) })),
+            pasos: e.pasos.filter(k => pasos[k]).map(k => ({ n: pasos[k].n, titulo: pasos[k].titulo, fondo: k === pk ? '#0A0A0A' : '#FFFFFF', tinta: k === pk ? '#FFFFFF' : '#0A0A0A', numF: k === pk ? '#FFFFFF' : '#0A0A0A', numT: k === pk ? '#0A0A0A' : '#FFFFFF', marca: k === pk ? '● ESTÁS AQUÍ' : '↗', ir: () => this.abrirPasoFlujo(k) })),
             haySig: sel < R.length - 1, sig: () => ir(sel + 1), sigTxt: sel < R.length - 1 ? 'Siguiente etapa: ' + R[sel + 1].titulo + ' →' : '', cerrar: () => ir(sel) }; _x.rutaSel.hayScripts = _x.rutaSel.scripts.length > 0; } } }
     { const L = _x.procesosFiltrados || _v.procesosFiltrados;
       if (Array.isArray(L)) _x.procesosFiltrados = L.map((p, i) => { const n = i % 2 === 0;
@@ -5119,7 +5257,7 @@ class Component extends DCLogic {
       if (R && pk >= 0) { const pasos = this.pasosDe(this.procDe(st.proc)), ps = R.findIndex(e => e.pasos.includes(pk));
         if (ps >= 0) _x.panelUbic = { hay: true, n: String(ps + 1).padStart(2, '0'), total: String(R.length).padStart(2, '0'), titulo: R[ps].titulo, paso: pasos[pk] ? pasos[pk].n : '', totalPasos: String(pasos.length).padStart(2, '0'),
           barras: R.map((e, i) => ({ flex: String(e.pasos.length), fondo: i < ps ? '#8A8A8A' : i === ps ? '#D1C973' : '#373737' })),
-          pasosEtapa: R[ps].pasos.filter(k => pasos[k]).map(k => ({ n: pasos[k].n, fondo: k === pk ? '#D1C973' : 'transparent', tinta: k === pk ? '#0A0A0A' : '#FFFFFF', borde: k === pk ? '#D1C973' : '#555555', ir: () => this.setState(s2 => ({ panel: { k }, vistos: { ...(s2.vistos || {}), [k]: true } })) })) }; } }
+          pasosEtapa: R[ps].pasos.filter(k => pasos[k]).map(k => ({ n: pasos[k].n, fondo: k === pk ? '#D1C973' : 'transparent', tinta: k === pk ? '#0A0A0A' : '#FFFFFF', borde: k === pk ? '#D1C973' : '#555555', ir: () => this.abrirPasoFlujo(k) })) }; } }
     { const md = this.modoFlujo(), set = m => { try { localStorage.setItem('cx-modo', m); } catch (e) {} this.setState({ modoFlujo: m, diagrama: m === 'completo', panel: null }); };
       _x.hayRuta = !!_x.hayRuta && md === 'ruta';
       if (md === 'ruta' && this.state.vista === 'proceso') { _x.diagramaAbierto = !!_x.hayRuta && (_x.rutaSelIdx >= 0); _x.hayRutaSel = false; }

@@ -12,7 +12,8 @@ export default async (req: Request) => {
     ? { tipo: 'asistente', token, email: s.email, nombre: s.nombre, pregunta: corta(b.pregunta, 500), vista: corta(b.vista, 60) }
     : esFeedback
     ? { tipo: 'feedback', token, email: s.email, nombre: s.nombre, proceso: corta(b.proceso, 200), paso: corta(b.paso, 200), clase: corta(b.clase, 60), comentario: corta(b.comentario, 3000), pagina: corta(b.pagina, 300) }
-    : { tipo: 'clics', token, email: s.email, nombre: s.nombre, clics: Math.max(0, Math.min(5000, Number(b.clics) || 0)), procesos: (Array.isArray(b.procesos) ? b.procesos : []).slice(0, 60).map((x: unknown) => corta(x, 80)), busquedas: (Array.isArray(b.busquedas) ? b.busquedas : []).slice(0, 30).map((x: unknown) => corta(x, 60)).filter((x: string) => !/\d{5,}|@/.test(x)) };
+    : { tipo: 'clics', token, email: s.email, nombre: s.nombre, clics: Math.max(0, Math.min(5000, Number(b.clics) || 0)), procesos: (Array.isArray(b.procesos) ? b.procesos : []).slice(0, 60).map((x: unknown) => corta(x, 80)), busquedas: (Array.isArray(b.busquedas) ? b.busquedas : []).slice(0, 30).map((x: unknown) => corta(x, 60)).filter((x: string) => !/\d{5,}|@/.test(x)),
+        eventos: (Array.isArray(b.eventos) ? b.eventos : []).slice(0, 200).map((e: any) => ({ ts: Number(e && e.ts) || Date.now(), modulo: corta(e && e.modulo, 60), proceso: corta(e && e.proceso, 120), paso: corta(e && e.paso, 160), accion: corta(e && e.accion, 160), busqueda: corta(e && e.busqueda, 120) })) };
   try {
     const r = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(datos), redirect: 'follow' });
     return json({ ok: r.ok }, r.ok ? 200 : 502);
