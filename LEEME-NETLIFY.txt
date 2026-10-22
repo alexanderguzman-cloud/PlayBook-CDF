@@ -1,4 +1,4 @@
-SomosCX — despliegue en Netlify
+Centro de formación CX · Somos — despliegue en Netlify
 
 1. Sube TODO el contenido de esta carpeta (incluida la carpeta netlify/) a la raíz del repositorio conectado a Netlify.
    No requiere comando de build. Netlify detecta solas las funciones de netlify/edge-functions.
