@@ -19,4 +19,6 @@ export async function leer(req: Request): Promise<Sesion | null> {
   } catch { return null; }
 }
 export const json = (o: unknown, status = 200, extra: Record<string, string> = {}) => new Response(JSON.stringify(o), { status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', ...extra } });
-export const dominio = () => (Netlify.env.get('ALLOWED_DOMAIN') || 'somosinternet.co').toLowerCase();
+// ALLOWED_DOMAIN admite varios dominios separados por coma, p. ej. «somosinternet.co,somosinternet.com».
+export const dominios = () => (Netlify.env.get('ALLOWED_DOMAIN') || 'somosinternet.co,somosinternet.com').toLowerCase().split(/[\s,;]+/).map(d => d.replace(/^@/, '')).filter(Boolean);
+export const dominio = () => dominios()[0];

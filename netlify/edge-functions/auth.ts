@@ -1,4 +1,4 @@
-// Protege todo el sitio: sin sesión válida de Google @somosinternet.co se envía a /login.html
+// Protege todo el sitio: sin sesión válida de Google (@somosinternet.co o @somosinternet.com) se envía a /login.html
 import { leer, json } from '../comun/session.ts';
 export default async (req: Request, context: any) => {
   const url = new URL(req.url);
