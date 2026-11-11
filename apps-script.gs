@@ -15,6 +15,7 @@ function doPost(e) {
   try { b = JSON.parse((e && e.postData && e.postData.contents) || '{}'); } catch (err) { return salida({ ok: false }); }
   const token = PropertiesService.getScriptProperties().getProperty('TOKEN');
   if (!token || b.token !== token) return salida({ ok: false, error: 'token' });
+  if (b.tipo === 'mywak') return salida(buscarMywak(b));
   const lock = LockService.getScriptLock(); lock.waitLock(15000);
   try {
     if (b.tipo === 'clics') registrarClics(b);
@@ -188,6 +189,21 @@ function doGet(e) {
   }
   const top = (o, n) => Object.keys(o).sort((a, b) => o[b] - o[a]).slice(0, n);
   return salida({ ok: true, procesos: top(cp, 8), busquedas: top(cb, 10) });
+}
+
+/** Alianza MYWAK: busca el teléfono del cliente en «Form Responses 1» del formulario y devuelve las columnas B a G. */
+const MYWAK_ID = '1_nuO-hiWPIJzZopc1U7KFHj5DJsXYt8AeJyvhCOxKjI';
+function buscarMywak(b) {
+  const tel = String(b.telefono || '').replace(/\D/g, '');
+  if (tel.length < 7) return { ok: false, error: 'telefono' };
+  const libro = SpreadsheetApp.openById(MYWAK_ID);
+  const hoja = libro.getSheetByName('Form Responses 1') || libro.getSheets().filter(s => s.getSheetId() === 753472753)[0] || libro.getSheets()[0];
+  const datos = hoja.getDataRange().getDisplayValues(), clave = tel.slice(-10), filas = [];
+  for (let i = 1; i < datos.length; i++) {
+    const d = String(datos[i][4] || '').replace(/\D/g, '');
+    if (d && d.slice(-10) === clave) filas.push({ fecha: datos[i][1], asesor: String(datos[i][2]).trim(), cliente: String(datos[i][3]).trim(), telefono: datos[i][4], conjunto: datos[i][5], beneficio: datos[i][6] });
+  }
+  return { ok: true, filas: filas.reverse().slice(0, 30) };
 }
 
 function salida(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
