@@ -15,7 +15,7 @@ function doPost(e) {
   try { b = JSON.parse((e && e.postData && e.postData.contents) || '{}'); } catch (err) { return salida({ ok: false }); }
   const token = PropertiesService.getScriptProperties().getProperty('TOKEN');
   if (!token || b.token !== token) return salida({ ok: false, error: 'token' });
-  if (b.tipo === 'mywak') return salida(buscarMywak(b));
+  if (b.tipo === 'mywak') { try { return salida(buscarMywak(b)); } catch (err) { return salida({ ok: false, error: 'mywak' }); } }
   const lock = LockService.getScriptLock(); lock.waitLock(15000);
   try {
     if (b.tipo === 'clics') registrarClics(b);
@@ -205,6 +205,9 @@ function buscarMywak(b) {
   }
   return { ok: true, filas: filas.reverse().slice(0, 30) };
 }
+
+/** Prueba manual: ejecútala una vez para autorizar el acceso a la hoja de MYWAK. */
+function probarMywak() { Logger.log(JSON.stringify(buscarMywak({ telefono: '3112651039' }))); }
 
 function salida(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
 

@@ -11,7 +11,9 @@ export default async (req: Request) => {
   try {
     const r = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ tipo: 'mywak', token, email: s.email, telefono }), redirect: 'follow' });
     const j = await r.json().catch(() => ({ ok: false }));
-    return json(j && (j as any).ok ? { ok: true, filas: (j as any).filas || [] } : { ok: false }, j && (j as any).ok ? 200 : 502);
+    if (!j || !(j as any).ok) return json({ ok: false }, 502);
+    if (!Array.isArray((j as any).filas)) return json({ ok: false, error: 'sin_buscador' }, 502); // el Apps Script publicado aún no tiene la búsqueda MYWAK
+    return json({ ok: true, filas: (j as any).filas });
   } catch { return json({ ok: false }, 502); }
 };
 export const config = { path: '/api/mywak' };
